@@ -20,7 +20,7 @@ from imblearn.under_sampling import RandomUnderSampler
 from sklearn.model_selection import GridSearchCV
 import time
 
-dataset = pd.read_csv("Stroke prediction/healthcare-dataset-stroke-data.csv", index_col="id")
+dataset = pd.read_csv("healthcare-dataset-stroke-data.csv", index_col="id")
 features = ['gender', 'age', 'hypertension', 'heart_disease', 'ever_married',
             'work_type', 'Residence_type', 'avg_glucose_level', 'bmi', 'smoking_status']
 target = 'stroke'
@@ -100,139 +100,11 @@ model = MLPClassifier(hidden_layer_sizes = 200,
 start = time.time()
 model.fit(X_train, y_train)
 end =time.time()
-print(end-start)
+print("Training time: ", end-start)
 start = time.time()
 predicted = model.predict(X_test)
 end = time.time()
-print(end-start)
+print("Predicting time", end-start)
+print(classification_report(y_test, predicted))
 
 
-#OKAYYYYYYYYYYYY NOW IT's MODEL TIMEEEEEEEE
-#model = MLPClassifier(hidden_layer_sizes = 150,activation = 'tanh', max_iter = 150)
-#model.fit(X_train, y_train)
-
-#predicted = model.predict(X_test)
-#report = classification_report(y_test, predicted)
-#print(report)
-def test_accuracy(hidden_layer_size, max_iters, X_train, X_test, y_train, y_test):
-    model = MLPClassifier(hidden_layer_sizes = hidden_layer_size,
-                          max_iter = max_iters)
-    model.fit(X_train, y_train)
-    predicted = model.predict(X_test)
-    return f1_score(y_test, predicted)
-
-def test_accuracy_SMOTE(hidden_layer_size, max_iters, X_train, X_test, y_train, y_test):
-    model = MLPClassifier(hidden_layer_sizes = hidden_layer_size,
-                          max_iter = max_iters)
-    oversample = SMOTE()
-    X_train, y_train = oversample.fit_resample(X_train, y_train)    
-    model.fit(X_train, y_train)
-    predicted = model.predict(X_test)
-    return f1_score(y_test, predicted)
-
-
-def test_accuracy_Under(hidden_layer_size, max_iters, X_train, X_test, y_train, y_test):
-    model = MLPClassifier(hidden_layer_sizes = hidden_layer_size,
-                          max_iter = max_iters)
-    undersampling = RandomUnderSampler(random_state = 10)
-    X_train, y_train = undersampling.fit_resample(X_train, y_train)    
-    model.fit(X_train, y_train)
-    predicted = model.predict(X_test)
-    return f1_score(y_test, predicted)
-f1_SMOTE = []
-f1_Under = []
-f1 = []
-iarray = []
-for i in range (1, 301, 10):
-    plt.figure()
-    plt.title("Epoch num:" + str(i), fontsize = 30) 
-    plt.xlabel("Number of hidden layer")
-    plt.ylim([0,100])
-    plt.ylabel("Time")
-    iarray.append(i)
-    jarray = []
-    time_none = []
-    time_SMOTE = []
-    time_Under = []
-    f1.append([])
-    f1_SMOTE.append([])
-    f1_Under.append([])
-    for j in range (1,301,10):
-        start = time.time()
-        f1[-1].append(test_accuracy(j, i, X_train, X_test, y_train, y_test))
-        end = time.time() 
-        time_none.append(end-start)
-        start = time.time()  
-        f1_SMOTE[-1].append(test_accuracy_SMOTE(j,i, X_train, X_test, y_train, y_test))
-        end = time.time() 
-        time_SMOTE.append(end-start)
-        start = time.time()  
-        f1_Under[-1].append(test_accuracy_Under(j,i, X_train, X_test, y_train, y_test))
-        end = time.time() 
-        time_Under.append(end-start)
-        jarray.append(j)
-    plt.plot(jarray,time_SMOTE,"^-r")
-    plt.plot(jarray,time_Under,"v-b")
-    plt.plot(jarray,time_none,"o-g")
-    plt.show() 
-plt.figure()    
-heatmap_f1 = plt.imshow(f1, cmap = "autumn")
-#for i in range(len(iarray)):
- #   for j in range(len(jarray)):
-  #      plt.text(j, i, f1[i][j].round(), ha="center", va="center", color="w")
-plt.colorbar(heatmap_f1)
-plt.title("Heatmap origin")
-plt.xlabel("Number Hidden Layer")
-plt.ylabel("Number Max iteration")
-plt.xticks(np.arange(len(iarray)), iarray)
-plt.yticks(np.arange(len(jarray)), jarray)
-plt.show()    
-
-plt.figure()       
-heatmap_f1_Under = plt.imshow(f1_Under[], cmap = "copper")
-#for i in range(len(iarray)):
- #   for j in range(len(jarray)):
-  #      plt.text(j, i, f1_Under[i][j].round(), ha="center", va="center", color="w")
-plt.colorbar(heatmap_f1_Under)
-plt.title("Heatmap UnderSampling")
-plt.xlabel("Number Hidden Layer")
-plt.ylabel("Number Max iteration")
-plt.xticks(np.arange(len(iarray)), iarray)
-plt.yticks(np.arange(len(jarray)),jarray)
-plt.show()
-
-plt.figure()       
-heatmap_f1_SMOTE = plt.imshow(f1_SMOTE, cmap = "Greens")
-#for i in range(len(iarray)):
- #   for j in range(len(jarray)):
-  #      plt.text(j, i, f1_SMOTE[i][j].round(), ha="center", va="center", color="w")
-plt.colorbar(heatmap_f1_SMOTE)
-plt.title("Heatmap SMOTE")
-plt.xlabel("Number Hidden Layer")
-plt.ylabel("Number Max iteration")
-plt.xticks(np.arange(len(iarray)), iarray)
-plt.yticks(np.arange(len(jarray)),jarray)
-plt.show()    
-from sklearn.metrics import f1_score
-
-undersampling = RandomUnderSampler(random_state = 10)
-X_train, y_train = undersampling.fit_resample(X_train, y_train)    
-activations = ["relu", "tanh", "logistic", "identity"]
-solvers = ['lbfgs', 'sgd', 'adam']
-plt.figure()
-f1 = []
-for i in solvers:
-    model = MLPClassifier(hidden_layer_sizes = 200,
-                          max_iter = 200, solver = i)
-    model.fit(X_train, y_train) 
-    predicted = model.predict(X_test)
-    f1.append(f1_score(y_test, predicted))
-x = np.arange(len(solvers))
-fig, ax = plt.subplots()
-ax.bar(x, f1, width = 0.35)
-ax.set_title("Solver compare")
-ax.set_ylabel("f1 score")
-ax.set_xticks(x)
-ax.set_xticklabels(solvers)
-fig.tight_layout()
-plt.show()
