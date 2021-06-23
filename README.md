@@ -41,7 +41,7 @@ Instead of building everything from scratch, we use these following libraries. S
 # Download project source code
 
 ```
-git clone https://github.com/phanmemmaytinhtql/IT31903_123220_Group18_Stroke-prediction.git
+https://github.com/LapTQ/IT31903_123220_Group18_Stroke-prediction.git
 ```
 
 # Contributors
